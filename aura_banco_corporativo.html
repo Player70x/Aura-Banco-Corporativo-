@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AURA | Banca Corporativa Premium</title>
+    <style>
+        :root {
+            --bg-principal: #0a0e17;
+            --bg-secundario: #131a26;
+            --bg-terciario: #1a2536;
+            --bg-card: #1e2a3a;
+            --texto-principal: #e2e8f0;
+            --texto-secundario: #94a3b8;
+            --texto-tenue: #64748b;
+            --acento-principal: #38bdf8;
+            --acento-secundario: #818cf8;
+            --exito: #10b981;
+            --error: #ef4444;
+            --advertencia: #f59e0b;
+            --info: #06b6d4;
+            --borde: #2a3b4d;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        
+        body { background-color: #000; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        
+        #app {
+            width: 600px;
+            height: 700px;
+            background-color: var(--bg-principal);
+            color: var(--texto-principal);
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .screen { display: none; width: 100%; height: 100%; flex-direction: column; }
+        .screen.active { display: flex; }
+
+        .btn {
+            padding: 12px; font-size: 14px; font-weight: bold; color: white; border: none; cursor: pointer;
+            width: 100%; margin: 5px 0; border-radius: 4px; text-align: center; display: inline-block;
+        }
+        .btn:hover { filter: brightness(1.1); }
+        .btn-primary { background-color: var(--acento-principal); }
+        .btn-success { background-color: var(--exito); }
+        .btn-danger { background-color: var(--error); }
+        .btn-tertiary { background-color: var(--bg-terciario); }
+
+        .input-group { margin-bottom: 15px; }
+        .input-group label { display: block; font-size: 12px; font-weight: bold; color: var(--texto-secundario); margin-bottom: 5px; }
+        .input-group input { 
+            width: 100%; padding: 12px; font-size: 14px; background-color: var(--bg-card); 
+            color: var(--texto-principal); border: none; border-radius: 4px; outline: none; 
+        }
+
+        /* Utils & UI specific styling */
+        .text-center { text-align: center; }
+        .mt-20 { margin-top: 20px; }
+        .p-20 { padding: 20px; }
+        
+        /* Dashboard Grids */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 5px; margin-top: 10px; }
+        .card { background-color: var(--bg-card); border: 1px solid var(--borde); padding: 15px; border-radius: 4px; }
+        
+        /* Modals */
+        .modal {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center; align-items: center; z-index: 100;
+        }
+        .modal-content { background: var(--bg-principal); padding: 20px; width: 400px; max-height: 90%; overflow-y: auto; border: 1px solid var(--borde); }
+        .modal.active { display: flex; }
+
+        canvas { background: #87CEEB; display: block; margin: 0 auto; outline: none; }
+    </style>
+</head>
+<body>
+
+<div id="app">
+    <!-- PANTALLA INICIO -->
+    <div id="screen-inicio" class="screen p-20 active">
+        <div class="text-center mt-20" style="margin-top: 60px;">
+            <div style="width: 100px; height: 100px; border: 3px solid var(--acento-principal); border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 40px; font-weight: bold; color: var(--acento-principal); margin: 0 auto; background: var(--bg-terciario);">A</div>
+            <h1 class="mt-20" style="font-size: 32px;">AURA</h1>
+            <p style="color: var(--texto-secundario); font-weight: bold;">BANCA CORPORATIVA PREMIUM</p>
+            <div style="display: flex; height: 2px; width: 300px; margin: 20px auto;">
+                <div style="background: var(--acento-principal); flex: 1;"></div>
+                <div style="background: var(--bg-terciario); flex: 1;"></div>
+                <div style="background: var(--acento-secundario); flex: 1;"></div>
+            </div>
+        </div>
+        <div style="background: var(--bg-secundario); border: 1px solid var(--borde); padding: 15px; text-align: center; margin: 20px 40px;">
+            <p style="color: var(--advertencia); font-weight: bold; font-size: 14px;">⚠️ Seguridad Premium</p>
+            <p style="color: var(--texto-secundario); font-size: 12px; margin-top: 5px;">Las cuentas inactivas por 24 horas<br>serán eliminadas automáticamente</p>
+        </div>
+        <div style="padding: 0 40px;">
+            <button class="btn btn-primary" onclick="showScreen('login')">🔐 Acceder a mi Banca</button>
+            <button class="btn btn-success" onclick="showScreen('registro')">💼 Abrir Cuenta Corporativa</button>
+        </div>
+        <div style="position: absolute; bottom: 10px; width: 100%; text-align: center; color: var(--texto-tenue); font-size: 11px;">
+            © 2024 AURA Bank - Todos los derechos reservados
+        </div>
+    </div>
+
+    <!-- PANTALLA LOGIN -->
+    <div id="screen-login" class="screen">
+        <div style="background: var(--bg-secundario); padding: 20px; text-align: center;">
+            <h2 style="font-size: 24px; margin-top: 10px;">🔐 Acceso Seguro</h2>
+        </div>
+        <div style="padding: 50px;">
+            <div class="input-group">
+                <label>ID de Usuario</label>
+                <input type="text" id="login-user">
+            </div>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" id="login-pass">
+            </div>
+            <button class="btn btn-primary mt-20" onclick="doLogin()">Ingresar</button>
+            <button class="btn btn-tertiary" onclick="showScreen('inicio')">Regresar</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA REGISTRO -->
+    <div id="screen-registro" class="screen">
+        <div style="background: var(--bg-secundario); padding: 20px; text-align: center;">
+            <h2 style="font-size: 24px; margin-top: 10px;">💼 Registro Corporativo</h2>
+        </div>
+        <div style="padding: 30px 50px;">
+            <div class="input-group">
+                <label>Nombre de Usuario</label>
+                <input type="text" id="reg-user">
+            </div>
+            <div class="input-group">
+                <label>Contraseña</label>
+                <input type="password" id="reg-pass">
+            </div>
+            <div class="input-group">
+                <label>Confirmar Contraseña</label>
+                <input type="password" id="reg-confirm">
+            </div>
+            <button class="btn btn-success mt-20" onclick="doRegister()">Activar Cuenta</button>
+            <button class="btn btn-tertiary" onclick="showScreen('inicio')">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- PANTALLA DASHBOARD -->
+    <div id="screen-dashboard" class="screen">
+        <div style="background: var(--bg-secundario); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 id="dash-user" style="font-size: 18px;">👤 Usuario</h2>
+                <p id="dash-last-access" style="font-size: 11px; color: var(--texto-tenue);">Último acceso: -</p>
+                <p id="dash-inflation" style="font-size: 11px; color: var(--advertencia);">Índice de valor: 1.000</p>
+            </div>
+            <button class="btn btn-danger" style="width: auto; padding: 8px 15px;" onclick="doLogout()">Cerrar Sesión</button>
+        </div>
+        
+        <div class="p-20">
+            <h3 style="font-size: 18px;">💳 Resumen de Cuentas</h3>
+            <div class="grid-2">
+                <div class="card">
+                    <p style="font-size: 11px; color: var(--texto-secundario);">💵 Cuenta Corriente</p>
+                    <h2 id="lbl-corriente" style="color: var(--exito); margin-top: 5px;">$0.00</h2>
+                </div>
+                <div class="card">
+                    <p style="font-size: 11px; color: var(--texto-secundario);">🏦 Cuenta de Ahorros</p>
+                    <h2 id="lbl-ahorros" style="color: var(--info); margin-top: 5px;">$0.00</h2>
+                </div>
+                <div class="card">
+                    <p style="font-size: 11px; color: var(--texto-secundario);">💳 Crédito Disponible</p>
+                    <h2 id="lbl-credito-disp" style="color: var(--advertencia); margin-top: 5px;">$0.00</h2>
+                </div>
+                <div class="card">
+                    <p style="font-size: 11px; color: var(--texto-secundario);">📊 Deuda de Crédito</p>
+                    <h2 id="lbl-deuda" style="color: var(--error); margin-top: 5px;">$0.00</h2>
+                </div>
+            </div>
+
+            <h3 style="font-size: 18px; margin-top: 25px;">⚡ Operaciones Rápidas</h3>
+            <div class="grid-3">
+                <button class="btn btn-success" style="padding: 15px 5px; font-size: 12px;" onclick="openModal('modal-minijuegos')">🎮<br>Minijuegos</button>
+                <button class="btn btn-primary" style="padding: 15px 5px; font-size: 12px;" onclick="opTransferir()">💸<br>Transferir</button>
+                <button class="btn" style="background:#f97316; padding: 15px 5px; font-size: 12px;" onclick="opRetirar()">🏧<br>Retirar</button>
+                <button class="btn" style="background:#8b5cf6; padding: 15px 5px; font-size: 12px;" onclick="opInvertir()">📈<br>Invertir</button>
+                <button class="btn" style="background:#f59e0b; padding: 15px 5px; font-size: 12px;" onclick="opUsarTarjeta()">💳<br>Usar Tarjeta</button>
+                <button class="btn" style="background:#06b6d4; padding: 15px 5px; font-size: 12px;" onclick="opPagarTarjeta()">💰<br>Pagar Tarjeta</button>
+                <button class="btn btn-tertiary" style="padding: 15px 5px; font-size: 12px;" onclick="opHistorial()">📜<br>Historial</button>
+                <button class="btn" style="background:#ec4899; padding: 15px 5px; font-size: 12px;" onclick="opMercado()">🛒<br>Mercado</button>
+                <button class="btn" style="background:#ec4899; padding: 15px 5px; font-size: 12px;" onclick="opLogros()">🏆<br>Logros</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALES / VENTANAS EMERGENTES -->
+    
+    <!-- Modal Minijuegos -->
+    <div id="modal-minijuegos" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h2 style="margin-bottom: 10px;">🎮 Gana Corporativos</h2>
+            <p style="font-size: 12px; color: var(--texto-secundario); margin-bottom: 20px;">Elige un minijuego (recompensas ajustadas)</p>
+            <button class="btn" style="background: #38bdf8;" onclick="startFlappyBird()">🐦 Flappy Bird</button>
+            <button class="btn" style="background: #f59e0b;" onclick="alert('Funcionalidad de minijuego portándose a Canvas...');">🧱 Block Blast</button>
+            <button class="btn" style="background: #8b5cf6;" onclick="alert('Funcionalidad de minijuego portándose a Canvas...');">🎯 Tetris</button>
+            <button class="btn btn-tertiary mt-20" onclick="closeModal('modal-minijuegos')">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modal Juego Activo -->
+    <div id="modal-game" class="modal" style="background: var(--bg-principal);">
+        <div style="width: 100%; height: 100%; position: relative;">
+            <div style="position: absolute; top: 10px; right: 10px; z-index: 10;">
+                <button class="btn btn-danger" style="width: auto; padding: 5px 10px;" onclick="endGame()">Cerrar Juego</button>
+            </div>
+            <canvas id="gameCanvas" width="400" height="600"></canvas>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- LÓGICA DE DATOS Y ESTADO --- //
+    const DB_FILE = "aura_banco_corporativo.json";
+    let currentUser = null;
+    let gameLoop = null;
+
+    function cargarDatos() {
+        let datos = JSON.parse(localStorage.getItem(DB_FILE));
+        if (!datos) datos = { usuarios: {}, inflacion: 1.0, logros: {} };
+        return datos;
+    }
+
+    function guardarDatos(datos) {
+        localStorage.setItem(DB_FILE, JSON.stringify(datos));
+    }
+
+    async function hashPassword(password) {
+        const salt = "aura_salt_2024";
+        const msgUint8 = new TextEncoder().encode(salt + password);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    function showScreen(screenId) {
+        document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+        document.getElementById(`screen-${screenId}`).classList.add('active');
+        if (screenId === 'dashboard') updateDashboard();
+    }
+
+    function openModal(modalId) { document.getElementById(modalId).classList.add('active'); }
+    function closeModal(modalId) { document.getElementById(modalId).classList.remove('active'); }
+
+    function getNowStr() {
+        const d = new Date();
+        return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,'0') + "-" + String(d.getDate()).padStart(2,'0') + " " + 
+               String(d.getHours()).padStart(2,'0') + ":" + String(d.getMinutes()).padStart(2,'0') + ":" + String(d.getSeconds()).padStart(2,'0');
+    }
+
+    // --- FUNCIONES DE AUTENTICACIÓN --- //
+    async function doLogin() {
+        const user = document.getElementById('login-user').value.trim();
+        const pass = document.getElementById('login-pass').value.trim();
+        if(!user || !pass) return alert("Por favor complete todos los campos.");
+        
+        let datos = cargarDatos();
+        let passHash = await hashPassword(pass);
+
+        if (datos.usuarios[user] && datos.usuarios[user].clave === passHash) {
+            currentUser = user;
+            datos.usuarios[user].ultimo_acceso = getNowStr();
+            guardarDatos(datos);
+            document.getElementById('login-user').value = "";
+            document.getElementById('login-pass').value = "";
+            showScreen('dashboard');
+        } else {
+            alert("Acceso Denegado. Credenciales incorrectas.");
+        }
+    }
+
+    async function doRegister() {
+        const user = document.getElementById('reg-user').value.trim();
+        const pass = document.getElementById('reg-pass').value.trim();
+        const conf = document.getElementById('reg-confirm').value.trim();
+        
+        if(!user || !pass || !conf) return alert("Todos los campos son obligatorios.");
+        if(user.length < 3) return alert("El nombre de usuario debe tener al menos 3 caracteres.");
+        if(pass.length < 6) return alert("La contraseña debe tener al menos 6 caracteres.");
+        if(pass !== conf) return alert("Las contraseñas no coinciden.");
+
+        let datos = cargarDatos();
+        if(datos.usuarios[user]) return alert("Este ID ya se encuentra asignado.");
+
+        let fecha = getNowStr();
+        datos.usuarios[user] = {
+            clave: await hashPassword(pass),
+            cuentas: { corriente: 100.00, ahorros: 50.00, credito_limite: 1000.00, credito_deuda: 0.00 },
+            historial: [
+                { fecha: fecha, tipo: "Apertura", monto: 100.00, detalles: "Bono de Cuenta Corriente" },
+                { fecha: fecha, tipo: "Apertura", monto: 50.00, detalles: "Bono de Cuenta de Ahorros" }
+            ],
+            ultimo_acceso: fecha, fecha_creacion: fecha,
+            mejoras: { interes: 0.15, comision_retiro: 0.02, limite_credito: 1000.00, recompensa_bonus: 0.0 }
+        };
+
+        guardarDatos(datos);
+        alert("¡Felicidades! Tu cuenta corporativa ha sido creada exitosamente.");
+        document.getElementById('reg-user').value = "";
+        document.getElementById('reg-pass').value = "";
+        document.getElementById('reg-confirm').value = "";
+        showScreen('inicio');
+    }
+
+    function doLogout() {
+        if(confirm("¿Está seguro que desea cerrar la sesión?")) {
+            currentUser = null;
+            showScreen('inicio');
+        }
+    }
+
+    // --- FUNCIONES BANCARIAS --- //
+    function updateDashboard() {
+        let datos = cargarDatos();
+        let usr = datos.usuarios[currentUser];
+        document.getElementById('dash-user').innerText = `👤 ${currentUser}`;
+        document.getElementById('dash-last-access').innerText = `Último acceso: ${usr.ultimo_acceso}`;
+        document.getElementById('dash-inflation').innerText = `Índice de valor: ${datos.inflacion.toFixed(3)}`;
+        
+        document.getElementById('lbl-corriente').innerText = `$${usr.cuentas.corriente.toFixed(2)}`;
+        document.getElementById('lbl-ahorros').innerText = `$${usr.cuentas.ahorros.toFixed(2)}`;
+        document.getElementById('lbl-credito-disp').innerText = `$${(usr.cuentas.credito_limite - usr.cuentas.credito_deuda).toFixed(2)}`;
+        document.getElementById('lbl-deuda').innerText = `$${usr.cuentas.credito_deuda.toFixed(2)}`;
+    }
+
+    function opRetirar() {
+        let monto = parseFloat(prompt("¿Cuánto deseas retirar? (Comisión actual: 2%)"));
+        if(!monto || monto <= 0) return;
+        let datos = cargarDatos();
+        let usr = datos.usuarios[currentUser];
+        let comision = monto * (usr.mejoras.comision_retiro || 0.02);
+        let total = monto + comision;
+        if(total > usr.cuentas.corriente) return alert("Fondos insuficientes (incluye comisión).");
+        
+        usr.cuentas.corriente -= total;
+        usr.historial.push({ fecha: getNowStr(), tipo: "Retiro", monto: monto, detalles: `Retiro en efectivo (comisión: $${comision.toFixed(2)})` });
+        guardarDatos(datos); alert(`Retiraste $${monto.toFixed(2)}. Comisión: $${comision.toFixed(2)}.`); updateDashboard();
+    }
+
+    function opTransferir() {
+        let dest = prompt("Introduce el nombre del usuario destino:");
+        if(!dest) return;
+        let datos = cargarDatos();
+        if(!datos.usuarios[dest]) return alert("El usuario destino no existe.");
+        if(dest === currentUser) return alert("No puedes transferir fondos a ti mismo.");
+        
+        let monto = parseFloat(prompt(`¿Cuánto enviarás a ${dest}?`));
+        if(!monto || monto <= 0) return;
+        
+        let usr = datos.usuarios[currentUser];
+        if(monto > usr.cuentas.corriente) return alert("Saldo insuficiente.");
+        
+        usr.cuentas.corriente -= monto;
+        datos.usuarios[dest].cuentas.corriente += monto;
+        let fecha = getNowStr();
+        usr.historial.push({ fecha: fecha, tipo: "Transferencia Enviada", monto: monto, detalles: `Fondos a ${dest}` });
+        datos.usuarios[dest].historial.push({ fecha: fecha, tipo: "Transferencia Recibida", monto: monto, detalles: `Fondos de ${currentUser}` });
+        
+        // Lógica de logros
+        if(!datos.logros[currentUser]) datos.logros[currentUser] = [];
+        if(!datos.logros[currentUser].includes("Primera transferencia")) { datos.logros[currentUser].push("Primera transferencia"); alert("¡Logro desbloqueado: Primera transferencia!"); }
+        
+        guardarDatos(datos); alert(`Transferencia completada por $${monto.toFixed(2)}`); updateDashboard();
+    }
+
+    function opInvertir() {
+        let monto = parseFloat(prompt("Cantidad a invertir (interés actual: 15%):"));
+        if(!monto || monto <= 0) return;
+        let datos = cargarDatos();
+        let usr = datos.usuarios[currentUser];
+        if(monto > usr.cuentas.corriente) return alert("Fondos insuficientes.");
+        
+        let interes = monto * (usr.mejoras.interes || 0.15);
+        let total = monto + interes;
+        usr.cuentas.corriente -= monto;
+        usr.cuentas.ahorros += total;
+        usr.historial.push({ fecha: getNowStr(), tipo: "Plazo Fijo", monto: monto, detalles: `Rendimiento neto: +$${interes.toFixed(2)}` });
+        guardarDatos(datos); alert(`Inversión Exitosa. Total a recibir: $${total.toFixed(2)}`); updateDashboard();
+    }
+
+    function opUsarTarjeta() {
+        let tienda = prompt("¿En qué tienda compras?");
+        if(!tienda) return;
+        let monto = parseFloat(prompt("Monto del consumo:"));
+        if(!monto || monto <= 0) return;
+        let datos = cargarDatos();
+        let usr = datos.usuarios[currentUser];
+        let disp = usr.cuentas.credito_limite - usr.cuentas.credito_deuda;
+        if(monto > disp) return alert("Excediste tu límite de crédito.");
+        
+        usr.cuentas.credito_deuda += monto;
+        usr.historial.push({ fecha: getNowStr(), tipo: "Consumo Tarjeta", monto: monto, detalles: `Compra en ${tienda}` });
+        guardarDatos(datos); alert(`Compra en ${tienda} por $${monto.toFixed(2)}`); updateDashboard();
+    }
+
+    function opPagarTarjeta() {
+        let datos = cargarDatos();
+        let usr = datos.usuarios[currentUser];
+        let deuda = usr.cuentas.credito_deuda;
+        if(deuda <= 0) return alert("No registras deudas.");
+        
+        let monto = parseFloat(prompt(`Deuda actual: $${deuda.toFixed(2)}. ¿Cuánto deseas pagar?`));
+        if(!monto || monto <= 0) return;
+        if(monto > usr.cuentas.corriente) return alert("Dinero insuficiente.");
+        if(monto > deuda) return alert("No puedes pagar más de lo que debes.");
+        
+        usr.cuentas.corriente -= monto;
+        usr.cuentas.credito_deuda -= monto;
+        usr.historial.push({ fecha: getNowStr(), tipo: "Pago Tarjeta", monto: monto, detalles: "Amortización de saldo deudor" });
+        guardarDatos(datos); alert(`Pago Exitoso. Deuda restante: $${(deuda - monto).toFixed(2)}`); updateDashboard();
+    }
+
+    function opHistorial() {
+        let datos = cargarDatos();
+        let historial = datos.usuarios[currentUser].historial;
+        if(historial.length === 0) return alert("No hay operaciones registradas.");
+        let txt = historial.slice(-10).reverse().map(h => `${h.fecha} | ${h.tipo} | $${h.monto.toFixed(2)}\nDetalle: ${h.detalles}`).join("\n\n");
+        alert("Últimos movimientos:\n\n" + txt);
+    }
+
+    function opMercado() { alert("Mercado de Mejoras (Replicando interfaz de Bank.py) \n\n* Aumentar interés (+5%) - $200\n* Reducir comisión retiro (-1%) - $150\n* Aumentar límite crédito (+$500) - $300\n* Aumentar recompensa minijuegos (+10%) - $250\n\n(Lógica adaptada por longitud)"); }
+    function opLogros() {
+        let datos = cargarDatos();
+        let lgs = (datos.logros && datos.logros[currentUser]) ? datos.logros[currentUser] : [];
+        if(lgs.length === 0) alert("Aún no tienes logros. ¡Juega y realiza operaciones para desbloquearlos!");
+        else alert("🏆 Tus logros:\n\n" + lgs.join("\n"));
+    }
+
+    // --- MINIJUEGO: FLAPPY BIRD --- //
+    // Replicación en Canvas HTML5 del Flappy Bird en tk.Canvas referenciado en[cite: 1]
+    let flappy = {};
+    const cvs = document.getElementById('gameCanvas');
+    const ctx = cvs.getContext('2d');
+
+    function startFlappyBird() {
+        closeModal('modal-minijuegos');
+        openModal('modal-game');
+        flappy = {
+            x: 100, y: 300, vel: 0, grav: 0.5, jump: -8,
+            pipes: [], score: 0, frames: 0, active: true
+        };
+        document.addEventListener('keydown', flappyJump);
+        document.addEventListener('mousedown', flappyJump);
+        if(gameLoop) cancelAnimationFrame(gameLoop);
+        loopFlappy();
+    }
+
+    function flappyJump(e) {
+        if(e.code === 'Space' || e.type === 'mousedown') flappy.vel = flappy.jump;
+    }
+
+    function loopFlappy() {
+        if(!flappy.active) return;
+        ctx.fillStyle = '#87CEEB'; ctx.fillRect(0,0,400,600); // Fondo
+
+        // Lógica Pájaro
+        flappy.vel += flappy.grav;
+        flappy.y += flappy.vel;
+        
+        ctx.fillStyle = '#FFD700';
+        ctx.beginPath(); ctx.arc(flappy.x, flappy.y, 15, 0, Math.PI*2); ctx.fill();
+
+        // Tuberías
+        if(flappy.frames % 100 === 0) {
+            let h = Math.random() * (350 - 50) + 50;
+            flappy.pipes.push({ x: 400, yTop: h, passed: false });
+        }
+
+        for(let i=0; i<flappy.pipes.length; i++) {
+            let p = flappy.pipes[i];
+            p.x -= 5;
+            ctx.fillStyle = '#228B22';
+            ctx.fillRect(p.x, 0, 60, p.yTop);
+            ctx.fillRect(p.x, p.yTop + 200, 60, 600 - (p.yTop + 200));
+
+            // Colisión
+            if((flappy.x + 15 > p.x && flappy.x - 15 < p.x + 60 && flappy.y - 15 < p.yTop) ||
+               (flappy.x + 15 > p.x && flappy.x - 15 < p.x + 60 && flappy.y + 15 > p.yTop + 200)) {
+                flappy.active = false;
+            }
+
+            // Puntuación
+            if(p.x + 60 < flappy.x && !p.passed) { p.passed = true; flappy.score++; }
+        }
+
+        if(flappy.pipes.length > 0 && flappy.pipes[0].x < -60) flappy.pipes.shift();
+        
+        // Suelo y techo
+        if(flappy.y > 600 || flappy.y < 0) flappy.active = false;
+
+        // HUD
+        ctx.fillStyle = 'white'; ctx.font = '20px "Segoe UI"';
+        ctx.fillText("Puntuación: " + flappy.score, 10, 30);
+
+        flappy.frames++;
+        if(flappy.active) gameLoop = requestAnimationFrame(loopFlappy);
+        else gameOverFlappy();
+    }
+
+    function gameOverFlappy() {
+        ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0,0,400,600);
+        ctx.fillStyle = 'white'; ctx.font = '30px bold "Segoe UI"'; ctx.fillText("¡Juego Terminado!", 80, 280);
+        
+        let datos = cargarDatos();
+        let usr = datos.usuarios[currentUser];
+        let base_reward = flappy.score * 50;
+        let inflacion = datos.inflacion || 1.0;
+        let bonus = usr.mejoras.recompensa_bonus || 0.0;
+        let finalReward = Math.floor(base_reward * (1 + bonus) * inflacion);
+
+        ctx.font = '20px "Segoe UI"'; ctx.fillText(`Recompensa: $${finalReward}`, 120, 330);
+        
+        if(finalReward > 0) {
+            usr.cuentas.corriente += finalReward;
+            usr.historial.push({ fecha: getNowStr(), tipo: "Minijuego", monto: finalReward, detalles: "Recompensa por Flappy Bird" });
+            datos.inflacion = inflacion * 0.995;
+            guardarDatos(datos);
+            updateDashboard();
+        }
+    }
+
+    function endGame() {
+        flappy.active = false;
+        document.removeEventListener('keydown', flappyJump);
+        document.removeEventListener('mousedown', flappyJump);
+        closeModal('modal-game');
+    }
+</script>
+
+</body>
+</html>
